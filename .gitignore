@@ -1,0 +1,23 @@
+/target
+
+# Editor
+.DS_Store
+*.swp
+.idea
+.vscode
+
+# Cache folders
+.cache
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Certificates
+*.crt
+*.pem
