@@ -48,21 +48,15 @@ jobs:
           use-cross: false
           command: build
           args: --release --locked --target ${{ matrix.target }}
-      - name: List files
+      - name: Strip release binary (linux and macos)
+        if: matrix.build == 'linux' || matrix.build == 'macos'
+        run: strip "target/${{ matrix.target}}/release/dsm"
+      - name: Build archive
         run: |
-          ls -al target
-          ls -al "target/${{ matrix.target }}"
-          ls -al "target/${{ matrix.target }}/release"
-
-      # - name: Strip release binary (linux and macos)
-        # if: matrix.build == 'linux' || matrix.build == 'macos'
-        # run: strip "target/release/dsm"
-      # - name: Build archive
-        # run: |
-          # staging="dsm-${{ github.ref }}-${{ matrix.target }}"
-          # mkdir -p "$staging"
-          # cp {README.md,LICENSE} "$staging/"
-          # cp "target/release/dsm" "$staging/"
-          # tar czf "$staging.tar.gz" "$staging"
-          # echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
-          # ls -al "$staging"
+          staging="dsm-${{ github.ref }}-${{ matrix.target }}"
+          mkdir -p "$staging"
+          cp {README.md,LICENSE} "$staging/"
+          cp "target/${{ matrix.target }}/release/dsm" "$staging/"
+          tar czf "$staging.tar.gz" "$staging"
+          echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
+          ls -al "$staging"
