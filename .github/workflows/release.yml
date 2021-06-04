@@ -14,15 +14,15 @@ jobs:
     strategy:
       matrix:
         build: [linux, macos]
-      include:
-        - build: linux
-          os: ubuntu-18.04
-          rust: nightly
-          target: x86_64-unknown-linux-musl
-        - build: macos
-          os: macos-latest
-          rust: nightly
-          target: x86_64-apple-darwin
+        include:
+          - build: linux
+            os: ubuntu-18.04
+            rust: nightly
+            target: x86_64-unknown-linux-musl
+          - build: macos
+            os: macos-latest
+            rust: nightly
+            target: x86_64-apple-darwin
 
     steps:
       - name: Checkout repository
