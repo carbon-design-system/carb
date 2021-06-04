@@ -28,6 +28,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -37,15 +44,19 @@ jobs:
           target: ${{ matrix.target }}
       - name: Build release binary
         run: cargo build --release --target ${{ matrix.target }}
-      - name: Strip release binary (linux and macos)
-        if: matrix.build == 'linux' || matrix.build == 'macos'
-        run: strip "target/release/dsm"
-      - name: Build archive
+      - name: List files
         run: |
-          staging="dsm-${{ github.ref }}-${{ matrix.target }}"
-          mkdir -p "$staging"
-          cp {README.md,LICENSE} "$staging/"
-          cp "target/release/dsm" "$staging/"
-          tar czf "$staging.tar.gz" "$staging"
-          echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
-          ls -al "$staging"
+          ls -al
+          ls -al target
+      # - name: Strip release binary (linux and macos)
+        # if: matrix.build == 'linux' || matrix.build == 'macos'
+        # run: strip "target/release/dsm"
+      # - name: Build archive
+        # run: |
+          # staging="dsm-${{ github.ref }}-${{ matrix.target }}"
+          # mkdir -p "$staging"
+          # cp {README.md,LICENSE} "$staging/"
+          # cp "target/release/dsm" "$staging/"
+          # tar czf "$staging.tar.gz" "$staging"
+          # echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
+          # ls -al "$staging"
