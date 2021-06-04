@@ -52,11 +52,33 @@ jobs:
         if: matrix.build == 'linux' || matrix.build == 'macos'
         run: strip "target/${{ matrix.target }}/release/dsm"
       - name: Build archive
+        id: archive
         run: |
-          staging="dsm-${{ github.ref }}-${{ matrix.target }}"
+          # staging="dsm-${{ github.ref }}-${{ matrix.target }}"
+          staging="dsm-test-${{ matrix.target }}"
           mkdir -p "$staging"
           cp {README.md,LICENSE} "$staging/"
           cp "target/${{ matrix.target }}/release/dsm" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
-          echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
-          ls -al "$staging"
+          echo "::set-output name=assets::$staging.tar.gz"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_name: 'Test Release'
+          # tag_name: ${{ github.ref }}
+          # release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.archive.outputs.assets }}
+          asset_name: ${{ steps.archive.outputs.assets }}
+          asset_content_type: application/octet-stream
