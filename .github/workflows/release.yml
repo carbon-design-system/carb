@@ -17,11 +17,11 @@ jobs:
         include:
           - build: linux
             os: ubuntu-18.04
-            rust: nightly
+            rust: stable
             target: x86_64-unknown-linux-musl
           - build: macos
             os: macos-latest
-            rust: nightly
+            rust: stable
             target: x86_64-apple-darwin
     steps:
       - name: Checkout repository
@@ -38,15 +38,22 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ matrix.rust }}
-          profile: minimal
           override: true
+          profile: minimal
           target: ${{ matrix.target }}
+          toolchain: ${{ matrix.rust }}
       - name: Build release binary
-        run: cargo build --release --target ${{ matrix.target }}
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: false
+          command: build
+          args: --release --locked --target ${{ matrix.target }}
       - name: List files
         run: |
-          ls -al target/release
+          ls -al target
+          ls -al "target/${{ matrix.target }}"
+          ls -al "target/${{ matrix.target }}/release"
+
       # - name: Strip release binary (linux and macos)
         # if: matrix.build == 'linux' || matrix.build == 'macos'
         # run: strip "target/release/dsm"
