@@ -23,7 +23,6 @@ jobs:
             os: macos-latest
             rust: nightly
             target: x86_64-apple-darwin
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -37,16 +36,16 @@ jobs:
           override: true
           target: ${{ matrix.target }}
       - name: Build release binary
-        run: cargo build --release
+        run: cargo build --release --target ${{ matrix.target }}
       - name: Strip release binary (linux and macos)
         if: matrix.build == 'linux' || matrix.build == 'macos'
-        run: strip "target/${{ matrix.target }}/release/dsm"
+        run: strip "target/release/dsm"
       - name: Build archive
         run: |
           staging="dsm-${{ github.ref }}-${{ matrix.target }}"
           mkdir -p "$staging"
           cp {README.md,LICENSE} "$staging/"
-          cp "target/${{ matrix.target }}/release/dsm" "$staging/"
+          cp "target/release/dsm" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
           echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
           ls -al "$staging"
