@@ -61,23 +61,13 @@ jobs:
           cp "target/${{ matrix.target }}/release/dsm" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
           echo "::set-output name=assets::$staging.tar.gz"
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          # release_name: Release ${{ github.ref }}
           release_name: 'Test Release'
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.archive.outputs.assets }}
-          asset_name: ${{ steps.archive.outputs.assets }}
-          asset_content_type: application/octet-stream
+          files: ${{ steps.archive.outputs.assets }}
