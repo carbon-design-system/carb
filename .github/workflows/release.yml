@@ -1,0 +1,73 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v[0-9]+.*'
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    env:
+      # Emit backtraces on panics
+      RUST_BACKTRACE: 1
+    strategy:
+      matrix:
+        build: [linux, macos]
+        include:
+          - build: linux
+            os: ubuntu-18.04
+            rust: stable
+            target: x86_64-unknown-linux-musl
+          - build: macos
+            os: macos-latest
+            rust: stable
+            target: x86_64-apple-darwin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          target: ${{ matrix.target }}
+          toolchain: ${{ matrix.rust }}
+      - name: Build release binary
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: false
+          command: build
+          args: --release --locked --target ${{ matrix.target }}
+      - name: Strip release binary (linux and macos)
+        if: matrix.build == 'linux' || matrix.build == 'macos'
+        run: strip "target/${{ matrix.target }}/release/dsm"
+      - name: Build archive
+        id: archive
+        run: |
+          version="${GITHUB_REF#refs/tags/}"
+          staging="dsm-$version-${{ matrix.target }}"
+          mkdir -p "$staging"
+          cp {README.md,LICENSE} "$staging/"
+          cp "target/${{ matrix.target }}/release/dsm" "$staging/"
+          tar czf "$staging.tar.gz" "$staging"
+
+          echo "::set-output name=assets::$staging.tar.gz"
+          echo "::set-output name=version::$version"
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.archive.outputs.version }}
+          name: ${{ steps.archive.outputs.version }}
+          draft: false
+          prerelease: false
+          files: ${{ steps.archive.outputs.assets }}
