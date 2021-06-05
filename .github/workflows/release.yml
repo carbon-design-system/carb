@@ -67,13 +67,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_name: 'Test Release'
-          # tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
           # release_name: Release ${{ github.ref }}
+          release_name: 'Test Release'
           draft: false
           prerelease: false
       - name: Upload Release Asset
-        id: upload-release-asset 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
