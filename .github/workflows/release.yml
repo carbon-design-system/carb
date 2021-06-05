@@ -1,10 +1,8 @@
 name: release
 on:
   push:
-    branches:
-      - ci/add-release-flow
-    # tags:
-      # - 'v[0-9]+.*'
+    tags:
+      - 'v[0-9]+.*'
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -54,20 +52,22 @@ jobs:
       - name: Build archive
         id: archive
         run: |
-          # staging="dsm-${{ github.ref }}-${{ matrix.target }}"
-          staging="dsm-test-${{ matrix.target }}"
+          version="${GITHUB_REF#refs/tags/}"
+          staging="dsm-$version-${{ matrix.target }}"
           mkdir -p "$staging"
           cp {README.md,LICENSE} "$staging/"
           cp "target/${{ matrix.target }}/release/dsm" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
+
           echo "::set-output name=assets::$staging.tar.gz"
+          echo "::set-output name=version::$version"
       - name: GitHub Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: 'Test Release'
+          tag_name: ${{ steps.archive.outputs.version }}
+          name: ${{ steps.archive.outputs.version }}
           draft: false
           prerelease: false
           files: ${{ steps.archive.outputs.assets }}
