@@ -48,15 +48,15 @@ jobs:
           args: --release --locked --target ${{ matrix.target }}
       - name: Strip release binary (linux and macos)
         if: matrix.build == 'linux' || matrix.build == 'macos'
-        run: strip "target/${{ matrix.target }}/release/dsm"
+        run: strip "target/${{ matrix.target }}/release/carb"
       - name: Build archive
         id: archive
         run: |
           version="${GITHUB_REF#refs/tags/}"
-          staging="dsm-$version-${{ matrix.target }}"
+          staging="carb-$version-${{ matrix.target }}"
           mkdir -p "$staging"
           cp {README.md,LICENSE} "$staging/"
-          cp "target/${{ matrix.target }}/release/dsm" "$staging/"
+          cp "target/${{ matrix.target }}/release/carb" "$staging/"
           tar czf "$staging.tar.gz" "$staging"
 
           echo "::set-output name=assets::$staging.tar.gz"
