@@ -4,7 +4,7 @@ use std::env;
 use std::process;
 use structopt::StructOpt;
 
-mod config;
+pub mod config;
 
 #[derive(StructOpt)]
 struct Cli {
