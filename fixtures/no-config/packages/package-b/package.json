@@ -1,0 +1,12 @@
+{
+  "name": "package-b",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "",
+    "clean": ""
+  },
+  "dependencies": {
+    "package-a": "^0.1.0"
+  }
+}
