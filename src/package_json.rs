@@ -20,6 +20,7 @@ pub struct PackageJson {
 }
 
 impl PackageJson {
+    /// Get the relevant fields from the contents of a package.json file
     pub fn from_str(contents: &str) -> Result<PackageJson, serde_json::Error> {
         let package_json: PackageJson = serde_json::from_str(&contents)?;
         Ok(package_json)
@@ -30,8 +31,10 @@ impl PackageJson {
 mod tests {
     use super::*;
 
+    type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
     #[test]
-    fn parse_package_json() -> Result<(), serde_json::Error> {
+    fn parse_package_json() -> Result<()> {
         let data = r#"
         {
             "name": "test",
@@ -50,7 +53,25 @@ mod tests {
             }
         }
         "#;
-        let _package_json = PackageJson::from_str(data)?;
+        let package_json = PackageJson::from_str(data)?;
+
+        assert_eq!(package_json.name, Some("test".into()));
+
+        Ok(())
+    }
+
+    #[test]
+    fn supports_extra_fields() -> Result<()> {
+        let data = r#"
+        {
+            "name": "test",
+            "extra-field": true
+        }
+        "#;
+        let package_json = PackageJson::from_str(data)?;
+
+        assert_eq!(package_json.name, Some("test".into()));
+
         Ok(())
     }
 }

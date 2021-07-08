@@ -54,7 +54,6 @@ impl Config {
             .parent()
             .expect("Expected config to be created in a directory");
 
-        println!("{:?}", config_path);
         fs::create_dir_all(config_dir)?;
         fs::write(config_path, contents)?;
 
