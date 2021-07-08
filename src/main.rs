@@ -5,6 +5,7 @@ use std::process;
 use structopt::StructOpt;
 
 pub mod config;
+pub mod package_json;
 
 #[derive(StructOpt)]
 struct Cli {
