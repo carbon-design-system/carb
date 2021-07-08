@@ -21,7 +21,7 @@ pub struct PackageJson {
 
 impl PackageJson {
     /// Get the relevant fields from the contents of a package.json file
-    pub fn from_str(contents: &str) -> Result<PackageJson, serde_json::Error> {
+    pub fn from_package_json(contents: &str) -> Result<PackageJson, serde_json::Error> {
         let package_json: PackageJson = serde_json::from_str(&contents)?;
         Ok(package_json)
     }
@@ -53,7 +53,7 @@ mod tests {
             }
         }
         "#;
-        let package_json = PackageJson::from_str(data)?;
+        let package_json = PackageJson::from_package_json(data)?;
 
         assert_eq!(package_json.name, Some("test".into()));
 
@@ -68,7 +68,7 @@ mod tests {
             "extra-field": true
         }
         "#;
-        let package_json = PackageJson::from_str(data)?;
+        let package_json = PackageJson::from_package_json(data)?;
 
         assert_eq!(package_json.name, Some("test".into()));
 
