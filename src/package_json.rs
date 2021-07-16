@@ -8,8 +8,6 @@ pub struct PackageJson {
     pub version: Option<String>,
     pub scripts: Option<HashMap<String, String>>,
     pub workspaces: Option<Vec<String>>,
-
-    #[serde(rename = "dependencies")]
     pub dependencies: Option<HashMap<String, String>>,
 
     #[serde(rename = "devDependencies")]

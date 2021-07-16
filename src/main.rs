@@ -1,3 +1,4 @@
+use config::Config;
 use env_logger::{fmt::Color, Builder};
 use log::{debug, error, info, Level};
 use std::env;
@@ -25,7 +26,9 @@ enum Subcommand {
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 fn main() {
-    let Cli { cmd, verbose } = Cli::from_args();
+    let Cli { cmd, mut verbose } = Cli::from_args();
+
+    verbose.set_default(Some(log::Level::Trace));
 
     init_logger(verbose.log_level());
 
@@ -38,6 +41,10 @@ fn main() {
 }
 
 fn try_main(cmd: Option<Subcommand>) -> Result<()> {
+    let cwd = env::current_dir().expect("Expected to find current working directory");
+
+    debug!("Running from: {:?}", cwd);
+
     match cmd {
         None => {
             info!("Default command");
@@ -47,11 +54,19 @@ fn try_main(cmd: Option<Subcommand>) -> Result<()> {
         Some(Subcommand::Init) => {
             info!("Creating a new project...");
 
-            let cwd = env::current_dir().expect("Expected to find current working directory");
+            match Config::exists(&cwd) {
+                Ok(config_path) => {
+                    return Err(format!("Configuration found at: {:?}", config_path).into());
+                }
+                Err(_) => {
+                    let config_path = Config::get_config_path(&cwd);
+                    Config::save(&Config::default(), &cwd)?;
 
-            debug!("Running from: {:?}", cwd);
+                    info!("Wrote config to: {:?}", config_path);
 
-            Ok(())
+                    Ok(())
+                }
+            }
         }
     }
 }

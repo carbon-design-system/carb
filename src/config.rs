@@ -61,7 +61,7 @@ impl Config {
     }
 
     // Get the config path from a given directory
-    fn get_config_path<P>(directory: P) -> PathBuf
+    pub fn get_config_path<P>(directory: P) -> PathBuf
     where
         P: AsRef<Path>,
     {
@@ -69,11 +69,11 @@ impl Config {
     }
 
     // Check to see if the configuration exists from the given directory
-    fn exists<P>(directory: P) -> Result<PathBuf, ConfigError>
+    pub fn exists<P>(directory: P) -> Result<PathBuf, ConfigError>
     where
         P: AsRef<Path>,
     {
-        let config_path = directory.as_ref().join(".carb").join("config.yml");
+        let config_path = Config::get_config_path(directory);
 
         if config_path.exists() {
             Ok(config_path)
