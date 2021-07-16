@@ -21,6 +21,18 @@ struct Cli {
 enum Subcommand {
     #[structopt(about = "initialize your project")]
     Init,
+
+    #[structopt(about = "Create a resource in your project")]
+    Create(Create),
+}
+
+#[derive(StructOpt)]
+enum Create {
+    #[structopt(about = "Create a component")]
+    Component {
+        #[structopt(short = "n", long, help = "The module name of the component")]
+        name: String,
+    },
 }
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -67,6 +79,11 @@ fn try_main(cmd: Option<Subcommand>) -> Result<()> {
                     Ok(())
                 }
             }
+        }
+
+        Some(Subcommand::Create(Create::Component { name })) => {
+            info!("Creating the component: {}", name);
+            Ok(())
         }
     }
 }
