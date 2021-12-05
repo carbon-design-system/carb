@@ -20,7 +20,7 @@ pub struct PackageJson {
 impl PackageJson {
     /// Get the relevant fields from the contents of a package.json file
     pub fn from_package_json(contents: &str) -> Result<PackageJson, serde_json::Error> {
-        let package_json: PackageJson = serde_json::from_str(&contents)?;
+        let package_json: PackageJson = serde_json::from_str(contents)?;
         Ok(package_json)
     }
 }
