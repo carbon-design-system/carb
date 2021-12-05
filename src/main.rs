@@ -7,6 +7,7 @@ use structopt::StructOpt;
 
 pub mod config;
 pub mod package_json;
+pub mod project;
 
 #[derive(StructOpt)]
 struct Cli {
@@ -48,6 +49,10 @@ fn try_main(cmd: Option<Subcommand>) -> Result<()> {
     match cmd {
         None => {
             info!("Default command");
+            let project = project::Project::find(cwd)?;
+
+            debug!("{:?}", project);
+
             Ok(())
         }
 
