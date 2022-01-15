@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -60,6 +61,9 @@ impl Workspace {
             workspaces,
         })
     }
+
+    // pub fn run_command(&self, command: String) -> Result<()> {
+    // }
 }
 
 use serde::{Deserialize, Serialize};
@@ -70,6 +74,7 @@ pub struct PackageJson {
     version: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     workspaces: Option<Vec<String>>,
+    scripts: Option<HashMap<String, String>>,
 }
 
 #[cfg(test)]
@@ -83,6 +88,7 @@ mod tests {
                 name: name.into(),
                 version: version.into(),
                 workspaces: None,
+                scripts: Default::default(),
             }
         }
 
