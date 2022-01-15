@@ -52,6 +52,12 @@ impl<T> DependencyGraph<T> {
     }
 }
 
+impl<T> Default for DependencyGraph<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub type NodeIndex = usize;
 
 #[derive(Debug)]
@@ -103,7 +109,7 @@ pub fn topological<T>(graph: &DependencyGraph<T>) -> Result<Vec<NodeIndex>, Topo
         match visit(graph, i, &mut visited, &mut visiting, &mut ordered) {
             Err(err) => return Err(err),
             Ok(()) => {
-                i = i + 1;
+                i += 1;
             }
         }
     }
