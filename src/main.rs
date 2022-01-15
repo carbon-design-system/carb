@@ -6,6 +6,7 @@ use std::process;
 use structopt::StructOpt;
 
 pub mod config;
+pub mod dependency_graph;
 pub mod package_json;
 pub mod project;
 
@@ -22,6 +23,12 @@ struct Cli {
 enum Subcommand {
     #[structopt(about = "initialize your project")]
     Init,
+
+    #[structopt(about = "run a command across your project")]
+    Run {
+        #[structopt(name = "command")]
+        cmd: String,
+    },
 }
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -72,6 +79,20 @@ fn try_main(cmd: Option<Subcommand>) -> Result<()> {
                     Ok(())
                 }
             }
+        }
+
+        Some(Subcommand::Run { cmd }) => {
+            info!("Running: {:?}", cmd);
+
+            let project = project::Project::find(cwd)?;
+            let _workspace = project.workspace;
+
+            use std::process::Command;
+            let output = Command::new("yarg").output().expect("failed to run help");
+
+            println!("{:?}", output);
+
+            Ok(())
         }
     }
 }
